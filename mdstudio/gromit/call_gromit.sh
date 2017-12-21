@@ -14,5 +14,4 @@ source $CERISE_API_FILES/miniconda/bin/activate root
 GMXRC_FILE="/hpc/sw/gromacs-2016.3-hsw-sp/bin/GMXRC.bash"
 GROMIT="$CERISE_API_FILES/mdstudio/github/cerise-mdstudio-cartesius/mdstudio/gromit/gromit_mpi.sh"
 
-. $GMXRC_FILE
 $GROMIT -gmxrc $GMXRC_FILE -vsite -np 8 -f $PROTEIN_PDB -top $PROTEIN_TOP -l $LIGAND_PDB,$LIGAND_TOP -ff $FORCE_FIELD -time $SIM_TIME -lie

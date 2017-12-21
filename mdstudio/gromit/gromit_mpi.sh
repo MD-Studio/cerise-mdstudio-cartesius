@@ -2,7 +2,7 @@
 
 PROGRAM=${0##*/}
 VERSION=2.4      # 20160512.0830
-GMXVERSION=5.x.y # But 4.x.y and 2016 are supported
+GMXVERSION=5 # But 4.x.y and 2016 are supported
 HISTORY="\
 "
 
@@ -591,14 +591,7 @@ echo Gromacs RC file: $GMXRC
 # Otherwise the script will rely on the active gromacs commands 
 [[ $GMXRC ]] && source $GMXRC 
 
-# Find out which Gromacs version this is
-GMXVERSION=$(mdrun -h 2>&1 | sed -n '/^.*VERSION \([^ ]*\).*$/{s//\1/p;q;}')
-# From version 5.0.x on, the commands are gathered in one 'gmx' program
-# The original commands are aliased, but there is no guarantee they will always remain
-[[ -z $GMXVERSION ]] && GMXVERSION=$(gmx -h 2>&1 | sed -n '/^.*VERSION \([^ ]*\).*$/{s//\1/p;q;}')
-# Version 2016 uses lower case "version", which is potentially ambiguous, so match carefully
-[[ -z $GMXVERSION ]] && GMXVERSION=$(gmx -h 2>&1 | sed -n '/^GROMACS:.*gmx, version \([^ ]*\).*$/{s//\1/p;q;}')
-ifs=$IFS; IFS="."; GMXVERSION=($GMXVERSION); IFS=$ifs
+echo "GMXVERSION is $GMXVERSION"
 
 # Set the directory for binaries
 [[ $GMXVERSION -gt 4 ]] && GMXBIN=$(which gmx_mpi) || GMXBIN=$(which mdrun)
@@ -606,6 +599,8 @@ ifs=$IFS; IFS="."; GMXVERSION=($GMXVERSION); IFS=$ifs
 GMXBIN=${GMXBIN%/*}
 # Set the directory to SCRIPTDIR if GMXBIN is empty 
 GMXBIN=${GMXBIN:-$SCRIPTDIR}
+
+echo "GMXBIN is $GMXBIN"
 
 # Make binaries executable if they are not
 # (This may be required for Grid processing)
@@ -620,7 +615,8 @@ GMXBIN=${GMXBIN:-$SCRIPTDIR}
 # In some cases, 'gromacs' is part of $GMXDATA
 if [[ $GMXVERSION -gt 4 ]]
 then
-    GMX="$GMXBIN/gmx_mpi " 
+    NRANKS="-np 2"
+    GMX="mpirun $NRANKS $GMXBIN/gmx_mpi " 
     GMXLIB=
 else
     GMX=$GMXBIN/
