@@ -601,7 +601,7 @@ GMXVERSION=$(mdrun -h 2>&1 | sed -n '/^.*VERSION \([^ ]*\).*$/{s//\1/p;q;}')
 ifs=$IFS; IFS="."; GMXVERSION=($GMXVERSION); IFS=$ifs
 
 # Set the directory for binaries
-[[ $GMXVERSION -gt 4 ]] && GMXBIN=$(which gmx) || GMXBIN=$(which mdrun)
+[[ $GMXVERSION -gt 4 ]] && GMXBIN=$(which gmx_mpi) || GMXBIN=$(which mdrun)
 # Extract the directory
 GMXBIN=${GMXBIN%/*}
 # Set the directory to SCRIPTDIR if GMXBIN is empty 
