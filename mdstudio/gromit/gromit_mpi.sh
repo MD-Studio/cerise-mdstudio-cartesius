@@ -620,7 +620,7 @@ GMXBIN=${GMXBIN:-$SCRIPTDIR}
 # In some cases, 'gromacs' is part of $GMXDATA
 if [[ $GMXVERSION -gt 4 ]]
 then
-    GMX="$GMXBIN/gmx " 
+    GMX="$GMXBIN/gmx_mpi " 
     GMXLIB=
 else
     GMX=$GMXBIN/
