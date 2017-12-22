@@ -2486,7 +2486,7 @@ then
 
     # a. Basic stuff
     SolFile=${SolFile:-$SolModel}
-    [[ $GMXVERSION -gt 4 ]] && SOLVATE="$GMXBIN/gmx_mpi solvate" || SOLVATE=$GMXBIN/genbox
+    [[ $GMXVERSION -gt 4 ]] && SOLVATE="$GMXBIN/gmx solvate" || SOLVATE=$GMXBIN/genbox
     SOLVATE="$SOLVATE -cp $GRO -cs $SolFile -o $base-sol-b4ions.gro"
 
     # b. Add program specific options from command line
@@ -2582,7 +2582,7 @@ then
 	then
 	    printf "%5d %5d %5d %5d %5d\n" $(SEQ ${Ligenv[@]}) | sed $'s/ 0//g;1s/^/[ check ]\\\n/' > charge.ndx
 	    NDX="-n charge.ndx"
-	    [[ $GMXVERSION -gt 4 ]] && TPRCONV="$GMXBIN/gmx_mpi tpr-convert" || TPRCONV="$GMXBIN/tpbconv"
+	    [[ $GMXVERSION -gt 4 ]] && TPRCONV="$GMXBIN/gmx tpr-convert" || TPRCONV="$GMXBIN/tpbconv"
 	    $TPRCONV -s $base-sol-b4ions.tpr -o $base-sol-b4ions-noligand.tpr -n charge.ndx >/dev/null 2>&1
             NCHARGE=$(getCharge $base-sol-b4ions-noligand.tpr)
 	    trash charge.ndx $base-sol-b4ions-noligand.tpr
@@ -3160,7 +3160,7 @@ then
 
     for edr in *-MD.part*.edr 
     do
-        [[ $GMXVERSION -gt 4 ]] && ENE="$GMXBIN/gmx_mpi energy" || ENE=$GMXBIN/g_energy
+        [[ $GMXVERSION -gt 4 ]] && ENE="$GMXBIN/gmx energy" || ENE=$GMXBIN/g_energy
 	echo $terms | $ENE -f $edr -o ${edr%.edr}.xvg 2>/dev/null | sed '/^Energy/,/^ *$/{/^ *$/q}' > ${edr%.edr}.lie
     done
 fi
