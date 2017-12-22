@@ -1,5 +1,5 @@
 #!/bin/bash
 
-PYTHON="/hpc/sw/python-3.5.0/bin/python3.5"
+module load python/3.5.0
 
-$PYTHON $HOME/.cerise/api/files/cerise/cwltiny.py $*
+python3 $HOME/.cerise/api/files/cerise/cwltiny.py $*
