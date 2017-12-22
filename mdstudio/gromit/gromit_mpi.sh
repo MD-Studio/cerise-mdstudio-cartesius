@@ -602,14 +602,6 @@ GMXBIN=${GMXBIN:-$SCRIPTDIR}
 
 echo "GMXBIN is $GMXBIN"
 
-# Make binaries executable if they are not
-# (This may be required for Grid processing)
-[[ -f $GMXBIN/grompp && ! -x $GMXBIN/grompp ]] && chmod +x $GMXBIN/grompp
-[[ -f $GMXBIN/mdrun  && ! -x $GMXBIN/mdrun  ]] && chmod +x $GMXBIN/mdrun
-[[ -f $GMXBIN/gmx    && ! -x $GMXBIN/gmx    ]] && chmod +x $GMXBIN/gmx
-
-[[ $GMXVERSION -gt 4 ]] && 
-
 # Set the command prefix and set the GMXLIB variable to point to 
 # the force field data and such.
 # In some cases, 'gromacs' is part of $GMXDATA
@@ -1549,7 +1541,7 @@ function MDRUNNER ()
     else
         NRANKS=""
     fi
-    MDRUN="${MPI_RUN} ${NRANKS} ${GMX}mdrun -v -nice 0 -deffnm $baseOUT -c $fnOUT -cpi $baseOUT.cpt -ntomp $NP $SPLIT $(program_options mdrun) -maxh $MAXH"
+    MDRUN="mpirun ${NRANKS} ${GMX}mdrun -v -nice 0 -deffnm $baseOUT -c $fnOUT -cpi $baseOUT.cpt -ntomp $NP $SPLIT $(program_options mdrun) -maxh $MAXH"
     echo
     echo "$MDRUN" | tee -a $fnLOG
     echo
@@ -2486,7 +2478,7 @@ then
 
     # a. Basic stuff
     SolFile=${SolFile:-$SolModel}
-    [[ $GMXVERSION -gt 4 ]] && SOLVATE="$GMXBIN/gmx solvate" || SOLVATE=$GMXBIN/genbox
+    [[ $GMXVERSION -gt 4 ]] && SOLVATE="mpirun -np 1 $GMXBIN/gmx_mpi solvate" || SOLVATE=$GMXBIN/genbox
     SOLVATE="$SOLVATE -cp $GRO -cs $SolFile -o $base-sol-b4ions.gro"
 
     # b. Add program specific options from command line
@@ -2582,7 +2574,7 @@ then
 	then
 	    printf "%5d %5d %5d %5d %5d\n" $(SEQ ${Ligenv[@]}) | sed $'s/ 0//g;1s/^/[ check ]\\\n/' > charge.ndx
 	    NDX="-n charge.ndx"
-	    [[ $GMXVERSION -gt 4 ]] && TPRCONV="$GMXBIN/gmx tpr-convert" || TPRCONV="$GMXBIN/tpbconv"
+	    [[ $GMXVERSION -gt 4 ]] && TPRCONV="mpirun -np 1 $GMXBIN/gmx_mpi tpr-convert" || TPRCONV="$GMXBIN/tpbconv"
 	    $TPRCONV -s $base-sol-b4ions.tpr -o $base-sol-b4ions-noligand.tpr -n charge.ndx >/dev/null 2>&1
             NCHARGE=$(getCharge $base-sol-b4ions-noligand.tpr)
 	    trash charge.ndx $base-sol-b4ions-noligand.tpr
@@ -3160,7 +3152,7 @@ then
 
     for edr in *-MD.part*.edr 
     do
-        [[ $GMXVERSION -gt 4 ]] && ENE="$GMXBIN/gmx energy" || ENE=$GMXBIN/g_energy
+        [[ $GMXVERSION -gt 4 ]] && ENE="mpi_run -np 1 $GMXBIN/gmx_mpi energy" || ENE=$GMXBIN/g_energy
 	echo $terms | $ENE -f $edr -o ${edr%.edr}.xvg 2>/dev/null | sed '/^Energy/,/^ *$/{/^ *$/q}' > ${edr%.edr}.lie
     done
 fi
